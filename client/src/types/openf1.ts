@@ -1,3 +1,14 @@
+export interface Meeting {
+  meeting_key: number;
+  meeting_name: string;
+  meeting_official_name: string;
+  country_name: string;
+  circuit_short_name: string;
+  location: string;
+  date_start: string;
+  year: number;
+}
+
 export interface Session {
   session_key: number;
   meeting_key: number;

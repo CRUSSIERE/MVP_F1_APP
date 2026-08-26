@@ -31,7 +31,7 @@ export function useLiveEngine(session: Session | null): EngineOutput {
     emptyPollsRef.current = 0;
     setMessage(undefined);
 
-    const seedEnd = new Date(new Date(session.date_start).getTime() + 120_000).toISOString();
+    const seedEnd = new Date(new Date(session.date_start).getTime() + 240_000).toISOString();
     fetchLocations(session.session_key, { dateFrom: session.date_start, dateTo: seedEnd })
       .then((pts) => setTrackPath(buildTrackPathFromLocations(pts)))
       .catch(() => undefined);

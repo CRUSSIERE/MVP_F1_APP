@@ -1,4 +1,4 @@
-import type { CarData, Driver, Interval, Lap, LocationPoint, Session } from "../types/openf1";
+import type { CarData, Driver, Interval, Lap, LocationPoint, Meeting, Session } from "../types/openf1";
 
 const API_BASE = "/api";
 
@@ -19,8 +19,12 @@ export function fetchLatestSession(): Promise<Session[]> {
   return getJson<Session[]>(`${API_BASE}/sessions`, { session_key: "latest" });
 }
 
-export function fetchSessions(params: { year?: string; country_name?: string }): Promise<Session[]> {
+export function fetchSessions(params: { year?: string; country_name?: string; meeting_key?: string }): Promise<Session[]> {
   return getJson<Session[]>(`${API_BASE}/sessions`, params);
+}
+
+export function fetchMeetings(year: string): Promise<Meeting[]> {
+  return getJson<Meeting[]>(`${API_BASE}/meetings`, { year });
 }
 
 export function fetchDrivers(sessionKey: number): Promise<Driver[]> {

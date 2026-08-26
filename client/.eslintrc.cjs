@@ -7,5 +7,6 @@ module.exports = {
   ignorePatterns: ["dist", ".eslintrc.cjs"],
   rules: {
     "react-refresh/only-export-components": "warn",
+    "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
   },
 };

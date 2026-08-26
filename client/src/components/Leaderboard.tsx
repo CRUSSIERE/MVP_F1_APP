@@ -23,7 +23,7 @@ export default function Leaderboard({ drivers, intervals, selectedDriver, onSele
   });
 
   return (
-    <div className="flex flex-col gap-1 overflow-y-auto max-h-[620px] pr-1">
+    <div className="flex flex-col gap-1 overflow-y-auto max-h-[50vh] lg:max-h-[620px] pr-1">
       {sorted.map((driver, idx) => {
         const iv = intervals[driver.driver_number];
         const isSelected = driver.driver_number === selectedDriver;
@@ -35,16 +35,20 @@ export default function Leaderboard({ drivers, intervals, selectedDriver, onSele
               isSelected ? "bg-neutral-700" : "bg-neutral-900 hover:bg-neutral-800"
             }`}
           >
-            <span className="w-5 text-neutral-400 tabular-nums">{idx + 1}</span>
+            <span className="w-4 shrink-0 text-neutral-400 tabular-nums">{idx + 1}</span>
             <span
               className="w-1.5 h-6 rounded-sm shrink-0"
               style={{ backgroundColor: driver.team_colour ? `#${driver.team_colour}` : "#666" }}
             />
-            <span className="w-8 font-semibold tabular-nums">{driver.driver_number}</span>
-            <span className="flex-1 truncate">{driver.name_acronym ?? driver.broadcast_name}</span>
-            <span className="text-neutral-400 text-xs truncate w-24">{driver.team_name}</span>
-            <span className="w-16 text-right tabular-nums text-neutral-300">{formatGap(iv?.gap_to_leader)}</span>
-            <span className="w-16 text-right tabular-nums text-neutral-500 text-xs">{formatGap(iv?.interval)}</span>
+            <span className="w-7 shrink-0 font-semibold tabular-nums">{driver.driver_number}</span>
+            <span className="flex-1 min-w-0 truncate">{driver.name_acronym ?? driver.broadcast_name}</span>
+            <span className="hidden md:block text-neutral-400 text-xs truncate w-24 shrink-0">{driver.team_name}</span>
+            <span className="w-14 shrink-0 text-right tabular-nums text-neutral-300 text-xs sm:text-sm">
+              {formatGap(iv?.gap_to_leader)}
+            </span>
+            <span className="hidden sm:block w-14 shrink-0 text-right tabular-nums text-neutral-500 text-xs">
+              {formatGap(iv?.interval)}
+            </span>
           </button>
         );
       })}

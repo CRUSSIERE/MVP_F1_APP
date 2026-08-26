@@ -5,6 +5,7 @@ import { fetchOpenF1, UpstreamError } from "../lib/openf1Client.js";
 // polling clients still see fresh-ish data, slow-changing resources (session
 // metadata, driver list) get a long TTL to minimize upstream calls.
 const TTL_MS: Record<string, number> = {
+  meetings: 300_000,
   sessions: 60_000,
   drivers: 60_000,
   location: 3_000,

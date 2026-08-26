@@ -25,7 +25,9 @@ export default function DriverDetailPanel({ driver, data, loading, onClose }: Pr
   if (!driver) return null;
 
   return (
-    <div className="fixed right-4 top-4 bottom-4 w-80 bg-neutral-900 border border-neutral-700 rounded-lg shadow-xl p-4 flex flex-col gap-4 overflow-y-auto z-10">
+    <>
+      <div className="fixed inset-0 bg-black/50 z-10 sm:hidden" onClick={onClose} />
+      <div className="fixed inset-x-3 bottom-3 max-h-[75vh] sm:inset-x-auto sm:bottom-4 sm:right-4 sm:top-4 sm:max-h-none sm:w-80 bg-neutral-900 border border-neutral-700 rounded-lg shadow-xl p-4 flex flex-col gap-4 overflow-y-auto z-20">
       <div className="flex items-start justify-between">
         <div>
           <div className="text-lg font-bold">
@@ -75,6 +77,7 @@ export default function DriverDetailPanel({ driver, data, loading, onClose }: Pr
       ) : (
         !loading && <div className="text-sm text-neutral-500">Pas de données disponibles pour ce pilote.</div>
       )}
-    </div>
+      </div>
+    </>
   );
 }
