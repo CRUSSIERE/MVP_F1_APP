@@ -57,6 +57,8 @@ export function fetchIntervals(sessionKey: number): Promise<Interval[]> {
   return getJson<Interval[]>(`${API_BASE}/intervals`, { session_key: String(sessionKey) });
 }
 
-export function fetchLaps(sessionKey: number): Promise<Lap[]> {
-  return getJson<Lap[]>(`${API_BASE}/laps`, { session_key: String(sessionKey) });
+export function fetchLaps(sessionKey: number, driverNumber?: number): Promise<Lap[]> {
+  const params: Record<string, string | undefined> = { session_key: String(sessionKey) };
+  if (driverNumber !== undefined) params.driver_number = String(driverNumber);
+  return getJson<Lap[]>(`${API_BASE}/laps`, params);
 }

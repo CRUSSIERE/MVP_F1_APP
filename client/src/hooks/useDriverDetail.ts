@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from "react";
-import { fetchCarData } from "../api/openf1";
-import type { CarData, Session } from "../types/openf1";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { fetchCarData, fetchLaps } from "../api/openf1";
+import type { CarData, Lap, Session } from "../types/openf1";
 import type { Mode } from "./useSessionSelection";
 
 const LIVE_POLL_MS = 2000;
 const LIVE_LOOKBACK_MS = 5000;
+const LAPS_POLL_MS = 10_000;
 
 interface Options {
   mode: Mode;
@@ -15,6 +16,12 @@ interface Options {
   virtualOffsetMs: number;
 }
 
+export interface LapInfo {
+  lapNumber: number | null;
+  lastLapDuration: number | null;
+  bestLapDuration: number | null;
+}
+
 export function useDriverDetail({
   mode,
   session,
@@ -22,9 +29,10 @@ export function useDriverDetail({
   windowStart,
   windowSeconds,
   virtualOffsetMs,
-}: Options): { data: CarData | null; loading: boolean } {
+}: Options): { data: CarData | null; loading: boolean; lapInfo: LapInfo | null } {
   const [data, setData] = useState<CarData | null>(null);
   const [loading, setLoading] = useState(false);
+  const [laps, setLaps] = useState<Lap[]>([]);
   const replaySeriesRef = useRef<CarData[]>([]);
   const replayDriverRef = useRef<number | null>(null);
 
@@ -96,5 +104,51 @@ export function useDriverDetail({
     setData(chosen);
   }, [mode, windowStart, virtualOffsetMs, driverNumber]);
 
-  return { data, loading };
+  // Lap timing (last / best lap, current lap number) for the selected
+  // driver — fetched once in replay, refreshed periodically in live.
+  useEffect(() => {
+    if (!session || driverNumber === null) {
+      setLaps([]);
+      return;
+    }
+    let cancelled = false;
+    async function load() {
+      if (!session || driverNumber === null) return;
+      try {
+        const list = await fetchLaps(session.session_key, driverNumber);
+        if (!cancelled) setLaps(list);
+      } catch {
+        // Keep last known laps on a transient failure.
+      }
+    }
+    load();
+    if (mode === "live") {
+      const id = setInterval(load, LAPS_POLL_MS);
+      return () => {
+        cancelled = true;
+        clearInterval(id);
+      };
+    }
+    return () => {
+      cancelled = true;
+    };
+  }, [mode, session, driverNumber]);
+
+  const lapInfo = useMemo<LapInfo | null>(() => {
+    if (laps.length === 0) return null;
+    const completed = laps.filter((l) => l.lap_duration !== null).sort((a, b) => a.lap_number - b.lap_number);
+    const last = completed[completed.length - 1] ?? null;
+    const best = completed.reduce<Lap | null>(
+      (min, l) => (min === null || l.lap_duration! < min.lap_duration! ? l : min),
+      null
+    );
+    const lapNumber = Math.max(...laps.map((l) => l.lap_number));
+    return {
+      lapNumber,
+      lastLapDuration: last?.lap_duration ?? null,
+      bestLapDuration: best?.lap_duration ?? null,
+    };
+  }, [laps]);
+
+  return { data, loading, lapInfo };
 }

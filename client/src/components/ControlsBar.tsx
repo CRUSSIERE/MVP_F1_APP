@@ -21,7 +21,7 @@ interface Props {
 const SPEED_OPTIONS = [1, 2, 5, 10, 25];
 
 const selectClass =
-  "bg-neutral-800 border border-neutral-700 rounded-md px-2.5 py-1.5 text-sm text-neutral-100 focus:outline-none focus:ring-1 focus:ring-red-500 disabled:opacity-50";
+  "bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-sm text-neutral-100 focus:outline-none focus:ring-2 focus:ring-red-500/60 disabled:opacity-50 transition-shadow";
 
 export default function ControlsBar({
   mode,
@@ -38,15 +38,15 @@ export default function ControlsBar({
   replayControls,
 }: Props) {
   return (
-    <div className="flex flex-col gap-3 bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 shadow-sm">
+    <div className="flex flex-col gap-3 bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3.5 shadow-sm">
       <div className="flex flex-wrap items-center gap-3">
-        <div className="flex rounded-md overflow-hidden border border-neutral-700 shrink-0">
+        <div className="flex rounded-lg overflow-hidden border border-neutral-700 shrink-0">
           {(["replay", "live"] as Mode[]).map((m) => (
             <button
               key={m}
               onClick={() => setMode(m)}
-              className={`px-3 py-1.5 text-sm font-semibold transition-colors ${
-                mode === m ? "bg-red-600 text-white" : "bg-neutral-800 text-neutral-300 hover:bg-neutral-700"
+              className={`px-4 py-2 text-sm font-semibold transition-colors ${
+                mode === m ? "bg-[#e10600] text-white" : "bg-neutral-800 text-neutral-300 hover:bg-neutral-700"
               }`}
             >
               {m === "live" ? "Live" : "Replay"}
@@ -98,7 +98,7 @@ export default function ControlsBar({
           <div className="flex items-center gap-2 sm:ml-auto">
             <button
               onClick={replayControls.togglePlaying}
-              className="px-3 py-1.5 text-sm bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 rounded-md"
+              className="px-3.5 py-2 text-sm font-medium bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 rounded-lg transition-colors"
             >
               {replayControls.playing ? "⏸ Pause" : "▶ Lecture"}
             </button>
