@@ -11,14 +11,27 @@ export class UpstreamError extends Error {
   }
 }
 
+// OpenF1's filter syntax puts comparison operators in the parameter *name*
+// itself, e.g. "date>=2023-..." or "speed<315" — the operator's "="
+// (for >=, <=) is part of the key, not a separate assignment. Building
+// this with URLSearchParams/URL would percent-encode ">"/"<"/"=" inside
+// the key AND insert its own "=" separator, producing "date>==..." or
+// "date%3E%3D=...", both of which OpenF1 rejects with a 404. So the query
+// string is built manually: a key already ending in an operator is
+// concatenated directly with the (encoded) value, everything else gets a
+// literal "=" separator.
+const OPERATOR_SUFFIXES = [">=", "<=", ">", "<"];
+
 function buildUrl(path: string, params: Record<string, string | undefined>): string {
-  const url = new URL(`${BASE_URL}/${path}`);
+  const parts: string[] = [];
   for (const [key, value] of Object.entries(params)) {
-    if (value !== undefined && value !== "") {
-      url.searchParams.set(key, value);
-    }
+    if (value === undefined || value === "") continue;
+    const hasOperatorSuffix = OPERATOR_SUFFIXES.some((op) => key.endsWith(op));
+    const separator = hasOperatorSuffix ? "" : "=";
+    parts.push(`${key}${separator}${encodeURIComponent(value)}`);
   }
-  return url.toString();
+  const query = parts.length > 0 ? `?${parts.join("&")}` : "";
+  return `${BASE_URL}/${path}${query}`;
 }
 
 /**
