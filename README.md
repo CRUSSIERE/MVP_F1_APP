@@ -88,6 +88,60 @@ client/
     App.tsx
 ```
 
+## Déploiement en production
+
+Le serveur peut servir lui-même le build du client : en production, tout
+tient donc dans **un seul service déployable** (pas besoin d'héberger le
+client à part).
+
+```bash
+npm run build     # build server + client (client/dist)
+NODE_ENV=production npm start   # sert l'API sur /api/* et le client sur tout le reste
+```
+
+Variables d'environnement :
+- `PORT` (optionnel, défaut `4000`)
+- `NODE_ENV=production` (obligatoire pour activer le service statique du
+  client — sans ça le serveur ne répond qu'aux routes `/api/*`)
+
+### Option Docker
+
+Un `Dockerfile` (multi-stage : build puis image d'exécution allégée) est
+fourni à la racine :
+
+```bash
+docker build -t f1-tracker-mvp .
+docker run -p 4000:4000 f1-tracker-mvp
+```
+
+Ouvrez `http://localhost:4000`.
+
+### Déployer sur une plateforme d'hébergement (Render, Railway, Fly.io…)
+
+Ces plateformes déploient directement depuis GitHub, sans configuration
+serveur à gérer soi-même. Exemple avec **Render** :
+
+1. Poussez le dépôt sur GitHub (déjà fait sur la branche
+   `claude/openf1-live-tracker-mvp-3c423k`).
+2. Sur [render.com](https://render.com) → **New → Web Service** → connectez
+   le dépôt GitHub.
+3. Renseignez :
+   - Build command : `npm install && npm run build`
+   - Start command : `npm start`
+   - Variable d'environnement : `NODE_ENV=production`
+4. Render assigne automatiquement une URL publique du type
+   `https://votre-service.onrender.com` — c'est le lien à ouvrir pour voir
+   l'app en ligne.
+
+Railway et Fly.io fonctionnent sur le même principe (Dockerfile détecté
+automatiquement, ou build/start command équivalents), et donnent aussi une
+URL publique après déploiement.
+
+Pour un site 100% statique séparé du serveur (ex. client sur Vercel/Netlify,
+serveur ailleurs), il faudrait pointer `client/src/api/openf1.ts` vers l'URL
+publique du serveur au lieu du chemin relatif `/api` actuel — non nécessaire
+avec l'approche « un seul service » ci-dessus.
+
 ## Endpoints OpenF1 utilisés (via le proxy)
 
 - `GET /api/sessions` → `sessions`
